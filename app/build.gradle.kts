@@ -90,6 +90,7 @@ dependencies {
     implementation(libs.timber)
 
     // Unit Testing
+    testImplementation(libs.kotlin.reflect)
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
