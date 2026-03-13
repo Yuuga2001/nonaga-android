@@ -1,11 +1,6 @@
 package jp.riverapp.hexlide.presentation.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,6 +9,8 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import jp.riverapp.hexlide.presentation.localization.LocalizationManager
 import jp.riverapp.hexlide.presentation.screen.game.GameScreen
+import jp.riverapp.hexlide.presentation.screen.online.OnlineGameScreen
+import jp.riverapp.hexlide.presentation.screen.online.OnlineLobbyScreen
 import jp.riverapp.hexlide.presentation.screen.settings.InAppWebViewScreen
 import jp.riverapp.hexlide.presentation.screen.settings.SettingsScreen
 
@@ -22,6 +19,7 @@ fun HexlideNavHost(
     localizationManager: LocalizationManager,
 ) {
     val navController = rememberNavController()
+    val strings = localizationManager.strings
 
     NavHost(
         navController = navController,
@@ -42,13 +40,15 @@ fun HexlideNavHost(
 
         // Online lobby
         composable(Screen.OnlineLobby.route) {
-            // TODO: Replace with OnlineLobbyScreen when implemented
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text("Online Lobby - Coming Soon")
-            }
+            OnlineLobbyScreen(
+                strings = strings,
+                onNavigateToGame = { gameId ->
+                    navController.navigate(Screen.OnlineGame.createRoute(gameId)) {
+                        popUpTo(Screen.OnlineLobby.route) { inclusive = true }
+                    }
+                },
+                onBack = { navController.popBackStack() },
+            )
         }
 
         // Online game (with deep link support)
@@ -64,13 +64,17 @@ fun HexlideNavHost(
             ),
         ) { backStackEntry ->
             val gameId = backStackEntry.arguments?.getString("gameId") ?: return@composable
-            // TODO: Replace with OnlineGameScreen when implemented
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text("Online Game: $gameId - Coming Soon")
-            }
+            OnlineGameScreen(
+                gameId = gameId,
+                strings = strings,
+                onBack = {
+                    if (!navController.popBackStack()) {
+                        navController.navigate(Screen.Game.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                },
+            )
         }
 
         // Settings
