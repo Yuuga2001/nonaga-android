@@ -46,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import jp.riverapp.hexlide.data.model.GameMode
 import jp.riverapp.hexlide.data.model.PlayerColor
+import jp.riverapp.hexlide.presentation.component.ConfettiEffect
 import jp.riverapp.hexlide.presentation.component.GameStatusBar
 import jp.riverapp.hexlide.presentation.component.HexBoard
 import jp.riverapp.hexlide.presentation.component.ModeSelectorSheet
@@ -247,6 +248,13 @@ fun GameScreen(
                     viewModel.startNewGame()
                 },
                 onDismiss = { viewModel.setShowModeSelector(false) },
+            )
+        }
+
+        // Confetti overlay (full screen, on top of everything)
+        if (uiState.winner != null) {
+            ConfettiEffect(
+                modifier = Modifier.fillMaxSize(),
             )
         }
 

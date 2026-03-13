@@ -4,15 +4,12 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -45,11 +42,9 @@ fun VictoryOverlay(
     modifier: Modifier = Modifier,
 ) {
     var showBadge by remember { mutableStateOf(false) }
-    var showConfetti by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         showBadge = true
-        showConfetti = true
     }
 
     val victoryText = when (mode) {
@@ -60,62 +55,46 @@ fun VictoryOverlay(
 
     val badgeColor = if (winner == PlayerColor.RED) HexlideColors.PieceRed else HexlideColors.PieceBlue
 
-    Box(
+    AnimatedVisibility(
+        visible = showBadge,
         modifier = modifier,
-        contentAlignment = Alignment.Center,
+        enter = slideInVertically(
+            animationSpec = spring(
+                dampingRatio = 0.7f,
+                stiffness = Spring.StiffnessMediumLow,
+            ),
+            initialOffsetY = { it },
+        ) + fadeIn(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            AnimatedVisibility(
-                visible = showBadge,
-                enter = slideInVertically(
-                    animationSpec = spring(
-                        dampingRatio = 0.7f,
-                        stiffness = Spring.StiffnessMediumLow,
-                    ),
-                    initialOffsetY = { it },
-                ) + fadeIn(),
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    // Victory badge
-                    Text(
-                        text = victoryText,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Black,
-                        color = Color.White,
-                        modifier = Modifier
-                            .shadow(20.dp, RoundedCornerShape(50))
-                            .clip(RoundedCornerShape(50))
-                            .background(badgeColor)
-                            .border(4.dp, Color.White, RoundedCornerShape(50))
-                            .padding(horizontal = 24.dp, vertical = 12.dp),
-                    )
+            // Victory badge
+            Text(
+                text = victoryText,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Black,
+                color = Color.White,
+                modifier = Modifier
+                    .shadow(20.dp, RoundedCornerShape(50))
+                    .clip(RoundedCornerShape(50))
+                    .background(badgeColor)
+                    .border(4.dp, Color.White, RoundedCornerShape(50))
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+            )
 
-                    // Play again button
-                    Text(
-                        text = strings.playAgain,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50))
-                            .background(HexlideColors.TextPrimary)
-                            .clickable(onClick = onPlayAgain)
-                            .padding(horizontal = 20.dp, vertical = 10.dp),
-                    )
-                }
-            }
-        }
-
-        // Confetti overlay
-        if (showConfetti) {
-            ConfettiEffect(
-                modifier = Modifier.fillMaxSize(),
+            // Play again button
+            Text(
+                text = strings.playAgain,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(HexlideColors.TextPrimary)
+                    .clickable(onClick = onPlayAgain)
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
             )
         }
     }
