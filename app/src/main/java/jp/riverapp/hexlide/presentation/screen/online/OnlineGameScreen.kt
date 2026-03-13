@@ -231,7 +231,6 @@ fun OnlineGameScreen(
 
             // Mode badge + End game button
             Row(
-                modifier = Modifier.padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -263,6 +262,9 @@ fun OnlineGameScreen(
                         .padding(horizontal = 14.dp, vertical = 5.dp),
                 )
             }
+
+            // Ad space placeholder (将来の広告バナー用スペース)
+            Spacer(modifier = Modifier.height(60.dp))
         }
     }
 }
