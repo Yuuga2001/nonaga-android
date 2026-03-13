@@ -49,6 +49,7 @@ import jp.riverapp.hexlide.data.model.PlayerColor
 import jp.riverapp.hexlide.domain.logic.GameConstants
 import jp.riverapp.hexlide.presentation.component.GameStatusBar
 import jp.riverapp.hexlide.presentation.component.HexBoard
+import jp.riverapp.hexlide.presentation.component.RulesSection
 import jp.riverapp.hexlide.presentation.component.VictoryOverlay
 import jp.riverapp.hexlide.presentation.localization.LocalizedStrings
 import jp.riverapp.hexlide.presentation.theme.HexlideColors
@@ -228,6 +229,11 @@ fun OnlineGameScreen(
                     }
                 }
             }
+
+            // Rules
+            RulesSection(strings = strings)
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Mode badge + End game button
             Row(
