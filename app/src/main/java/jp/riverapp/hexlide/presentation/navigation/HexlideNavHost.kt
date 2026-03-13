@@ -68,10 +68,8 @@ fun HexlideNavHost(
                 gameId = gameId,
                 strings = strings,
                 onBack = {
-                    if (!navController.popBackStack()) {
-                        navController.navigate(Screen.Game.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
+                    navController.navigate(Screen.OnlineLobby.route) {
+                        popUpTo(Screen.Game.route) { inclusive = false }
                     }
                 },
             )
