@@ -2,7 +2,10 @@ package jp.riverapp.hexlide.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,7 +26,8 @@ fun HexlideNavHost(
     localizationManager: LocalizationManager,
 ) {
     val navController = rememberNavController()
-    val strings = localizationManager.strings
+    val language by localizationManager.language.collectAsStateWithLifecycle()
+    val strings = remember(language) { localizationManager.strings }
 
     NavHost(
         navController = navController,
