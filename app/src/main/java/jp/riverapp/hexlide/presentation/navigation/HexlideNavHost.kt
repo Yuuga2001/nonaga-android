@@ -1,18 +1,22 @@
 package jp.riverapp.hexlide.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import jp.riverapp.hexlide.data.model.GameMode
 import jp.riverapp.hexlide.presentation.localization.LocalizationManager
 import jp.riverapp.hexlide.presentation.screen.game.GameScreen
 import jp.riverapp.hexlide.presentation.screen.online.OnlineGameScreen
 import jp.riverapp.hexlide.presentation.screen.online.OnlineLobbyScreen
 import jp.riverapp.hexlide.presentation.screen.settings.InAppWebViewScreen
 import jp.riverapp.hexlide.presentation.screen.settings.SettingsScreen
+import jp.riverapp.hexlide.presentation.viewmodel.LocalGameViewModel
 
 @Composable
 fun HexlideNavHost(
@@ -26,8 +30,22 @@ fun HexlideNavHost(
         startDestination = Screen.Game.route,
     ) {
         // Game screen (local)
-        composable(Screen.Game.route) {
+        composable(Screen.Game.route) { backStackEntry ->
+            val viewModel: LocalGameViewModel = hiltViewModel()
+
+            // ロビーから戻った際にAIモードに切り替え
+            LaunchedEffect(Unit) {
+                backStackEntry.savedStateHandle.getStateFlow("switchToAI", false)
+                    .collect { shouldSwitch ->
+                        if (shouldSwitch) {
+                            viewModel.switchMode(GameMode.AI)
+                            backStackEntry.savedStateHandle["switchToAI"] = false
+                        }
+                    }
+            }
+
             GameScreen(
+                viewModel = viewModel,
                 localizationManager = localizationManager,
                 onNavigateToOnline = {
                     navController.navigate(Screen.OnlineLobby.route)
@@ -47,7 +65,11 @@ fun HexlideNavHost(
                         popUpTo(Screen.OnlineLobby.route) { inclusive = true }
                     }
                 },
-                onBack = { navController.popBackStack() },
+                onBack = {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle?.set("switchToAI", true)
+                    navController.popBackStack()
+                },
             )
         }
 
