@@ -20,13 +20,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -148,8 +146,6 @@ fun OnlineLobbyScreen(
                             copied = false
                             showJoinForm = false
                         },
-                        onGameStarted = { gameId -> onNavigateToGame(gameId) },
-                        viewModel = viewModel,
                     )
                 } else if (showJoinForm) {
                     JoinFormView(
@@ -247,31 +243,8 @@ private fun WaitingView(
     onCopy: (String) -> Unit,
     onCopiedReset: () -> Unit,
     onCancel: () -> Unit,
-    onGameStarted: (String) -> Unit,
-    viewModel: OnlineLobbyViewModel,
 ) {
     val gameUrl = Constants.Api.BASE_URL + "/game/" + game.gameId
-
-    // Poll for game start
-    LaunchedEffect(game.gameId) {
-        var consecutiveFailures = 0
-        while (true) {
-            delay(1000)
-            try {
-                val updated = viewModel.let {
-                    // We can't directly call repository here, so we use a polling approach
-                    // by checking the state changes propagated by the ViewModel
-                    null
-                }
-                // The actual polling is best handled via the onNavigateToGame callback
-                // which is triggered by LaunchedEffect on joinedGameId/status changes
-                break
-            } catch (_: Exception) {
-                consecutiveFailures++
-                if (consecutiveFailures >= 5) break
-            }
-        }
-    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

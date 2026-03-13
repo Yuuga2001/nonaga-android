@@ -8,6 +8,7 @@ import jp.riverapp.hexlide.data.model.GameStatus
 import jp.riverapp.hexlide.data.model.PlayerColor
 import jp.riverapp.hexlide.data.repository.GameRepository
 import jp.riverapp.hexlide.domain.logic.GameConstants
+import jp.riverapp.hexlide.domain.service.GamePollingService
 import jp.riverapp.hexlide.presentation.viewmodel.OnlineLobbyViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,13 +30,15 @@ class OnlineLobbyViewModelTests {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var repository: GameRepository
+    private lateinit var pollingService: GamePollingService
     private lateinit var viewModel: OnlineLobbyViewModel
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         repository = mockk(relaxed = true)
-        viewModel = OnlineLobbyViewModel(repository)
+        pollingService = mockk(relaxed = true)
+        viewModel = OnlineLobbyViewModel(repository, pollingService)
     }
 
     @After

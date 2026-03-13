@@ -8,6 +8,7 @@ import jp.riverapp.hexlide.data.model.ApiError
 import jp.riverapp.hexlide.data.model.GameSession
 import jp.riverapp.hexlide.data.model.GameStatus
 import jp.riverapp.hexlide.data.repository.GameRepository
+import jp.riverapp.hexlide.domain.service.GamePollingService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +27,7 @@ data class OnlineLobbyUiState(
 @HiltViewModel
 class OnlineLobbyViewModel @Inject constructor(
     private val repository: GameRepository,
+    private val pollingService: GamePollingService,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OnlineLobbyUiState())
@@ -52,6 +54,8 @@ class OnlineLobbyViewModel @Inject constructor(
                         isCreating = false,
                     )
                 }
+                // ルーム作成後、対戦相手の参加を検出するためポーリング開始
+                startWaitingPolling(game.gameId)
             } catch (e: Exception) {
                 updateState {
                     copy(
@@ -61,6 +65,27 @@ class OnlineLobbyViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun startWaitingPolling(gameId: String) {
+        pollingService.startPolling(
+            scope = viewModelScope,
+            gameId = gameId,
+            onUpdate = { updatedGame ->
+                updateState { copy(gameSession = updatedGame) }
+                // ゲームが開始されたらポーリング停止（ナビゲーションはUIのLaunchedEffectが処理）
+                if (updatedGame.status != GameStatus.WAITING) {
+                    pollingService.stopPolling()
+                }
+            },
+            onError = {
+                updateState { copy(error = "connection_error") }
+            },
+        )
+    }
+
+    fun stopPolling() {
+        pollingService.stopPolling()
     }
 
     fun joinWithRoomCode() {
@@ -143,6 +168,12 @@ class OnlineLobbyViewModel @Inject constructor(
     }
 
     fun reset() {
+        pollingService.stopPolling()
         _uiState.value = OnlineLobbyUiState()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        pollingService.stopPolling()
     }
 }
