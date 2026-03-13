@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import androidx.lifecycle.Lifecycle
 import jp.riverapp.hexlide.data.model.GameMode
 import jp.riverapp.hexlide.presentation.localization.LocalizationManager
 import jp.riverapp.hexlide.presentation.screen.game.GameScreen
@@ -52,27 +53,36 @@ fun HexlideNavHost(
                 viewModel = viewModel,
                 localizationManager = localizationManager,
                 onNavigateToOnline = {
-                    navController.navigate(Screen.OnlineLobby.route)
+                    if (backStackEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        navController.navigate(Screen.OnlineLobby.route)
+                    }
                 },
                 onNavigateToSettings = {
-                    navController.navigate(Screen.Settings.route)
+                    if (backStackEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        navController.navigate(Screen.Settings.route)
+                    }
                 },
             )
         }
 
         // Online lobby
-        composable(Screen.OnlineLobby.route) {
+        composable(Screen.OnlineLobby.route) { backStackEntry ->
             OnlineLobbyScreen(
                 strings = strings,
                 onNavigateToGame = { gameId ->
-                    navController.navigate(Screen.OnlineGame.createRoute(gameId)) {
-                        popUpTo(Screen.OnlineLobby.route) { inclusive = true }
+                    if (backStackEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        navController.navigate(Screen.OnlineGame.createRoute(gameId)) {
+                            popUpTo(Screen.OnlineLobby.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
                     }
                 },
                 onBack = {
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle?.set("switchToAI", true)
-                    navController.popBackStack()
+                    if (backStackEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        navController.previousBackStackEntry
+                            ?.savedStateHandle?.set("switchToAI", true)
+                        navController.popBackStack()
+                    }
                 },
             )
         }
@@ -94,20 +104,29 @@ fun HexlideNavHost(
                 gameId = gameId,
                 strings = strings,
                 onBack = {
-                    navController.navigate(Screen.OnlineLobby.route) {
-                        popUpTo(Screen.Game.route) { inclusive = false }
+                    if (backStackEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        navController.navigate(Screen.OnlineLobby.route) {
+                            popUpTo(Screen.Game.route) { inclusive = false }
+                            launchSingleTop = true
+                        }
                     }
                 },
             )
         }
 
         // Settings
-        composable(Screen.Settings.route) {
+        composable(Screen.Settings.route) { backStackEntry ->
             SettingsScreen(
                 localizationManager = localizationManager,
-                onBack = { navController.popBackStack() },
+                onBack = {
+                    if (backStackEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        navController.popBackStack()
+                    }
+                },
                 onNavigateToWebView = { url ->
-                    navController.navigate(Screen.WebView.createRoute(url))
+                    if (backStackEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        navController.navigate(Screen.WebView.createRoute(url))
+                    }
                 },
             )
         }
@@ -123,7 +142,11 @@ fun HexlideNavHost(
             val url = java.net.URLDecoder.decode(encodedUrl, "UTF-8")
             InAppWebViewScreen(
                 url = url,
-                onBack = { navController.popBackStack() },
+                onBack = {
+                    if (backStackEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        navController.popBackStack()
+                    }
+                },
             )
         }
     }
