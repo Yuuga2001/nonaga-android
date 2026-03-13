@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -92,19 +91,25 @@ fun OnlineLobbyScreen(
                     .padding(top = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = onBack) {
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onBack() }
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = strings.back,
                         tint = HexlideColors.PieceBlue,
                     )
+                    Text(
+                        text = strings.back,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = HexlideColors.PieceBlue,
+                    )
                 }
-                Text(
-                    text = strings.back,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = HexlideColors.PieceBlue,
-                )
                 Spacer(modifier = Modifier.weight(1f))
             }
 
