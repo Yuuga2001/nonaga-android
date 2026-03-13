@@ -80,6 +80,36 @@ fun HexBoard(
         // Smaller hex points for dest guides
         val hexPointsSmall = remember { HexMath.hexagonPoints(tileSize * 0.85f) }
 
+        // Tile animation data - animate pixel positions
+        val tileAnimTargets = remember(tiles, scale, offsetX, offsetY) {
+            tiles.map { tile ->
+                val (px, py) = HexMath.hexToPixel(tile.q, tile.r, hexSize)
+                Pair(px * scale + offsetX, py * scale + offsetY)
+            }
+        }
+
+        // Create animated values for each tile
+        val animatedTilePositions = tiles.mapIndexed { index, _ ->
+            val target = tileAnimTargets.getOrNull(index)
+            val animX by animateFloatAsState(
+                targetValue = target?.first ?: 0f,
+                animationSpec = tween(
+                    durationMillis = 800,
+                    easing = HexSlideEasing,
+                ),
+                label = "tileX_$index",
+            )
+            val animY by animateFloatAsState(
+                targetValue = target?.second ?: 0f,
+                animationSpec = tween(
+                    durationMillis = 800,
+                    easing = HexSlideEasing,
+                ),
+                label = "tileY_$index",
+            )
+            Pair(animX, animY)
+        }
+
         // Piece animation data - animate pixel positions
         data class PieceAnimData(val id: String, val targetX: Float, val targetY: Float)
 
@@ -95,7 +125,7 @@ fun HexBoard(
         }
 
         // Create animated values for each piece
-        val animatedPositions = pieces.mapIndexed { index, piece ->
+        val animatedPiecePositions = pieces.mapIndexed { index, piece ->
             val target = pieceAnimTargets.getOrNull(index)
             val animX by animateFloatAsState(
                 targetValue = target?.targetX ?: 0f,
@@ -190,9 +220,10 @@ fun HexBoard(
         ) {
             // ----- Layer 1: Tiles -----
             for ((index, tile) in tiles.withIndex()) {
-                val (px, py) = HexMath.hexToPixel(tile.q, tile.r, hexSize)
-                val screenX = px * scale + offsetX
-                val screenY = py * scale + offsetY
+                val (screenX, screenY) = animatedTilePositions.getOrElse(index) {
+                    val (px, py) = HexMath.hexToPixel(tile.q, tile.r, hexSize)
+                    Pair(px * scale + offsetX, py * scale + offsetY)
+                }
                 val tileKey = tile.coordsKey
                 val isVictoryTile = victoryLine.contains(tileKey)
                 val isSelectedTile = phase == GamePhase.MOVE_TILE &&
@@ -289,7 +320,7 @@ fun HexBoard(
 
             // ----- Layer 4: Pieces -----
             for ((index, piece) in pieces.withIndex()) {
-                val (animX, animY) = animatedPositions.getOrElse(index) {
+                val (animX, animY) = animatedPiecePositions.getOrElse(index) {
                     val (px, py) = HexMath.hexToPixel(piece.q, piece.r, hexSize)
                     Pair(px * scale + offsetX, py * scale + offsetY)
                 }
