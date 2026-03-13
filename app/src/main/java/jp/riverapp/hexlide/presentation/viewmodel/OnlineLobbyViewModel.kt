@@ -4,11 +4,11 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.riverapp.hexlide.data.model.ApiError
 import jp.riverapp.hexlide.data.model.GameSession
 import jp.riverapp.hexlide.data.model.GameStatus
 import jp.riverapp.hexlide.data.repository.GameRepository
 import jp.riverapp.hexlide.domain.service.GamePollingService
+import retrofit2.HttpException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -117,14 +117,17 @@ class OnlineLobbyViewModel @Inject constructor(
                         isJoining = false,
                     )
                 }
-            } catch (e: ApiError.GameNotFound) {
-                updateState { copy(error = "game_not_found", isJoining = false) }
-            } catch (e: ApiError.GameAlreadyStarted) {
-                updateState { copy(error = "game_already_started", isJoining = false) }
+            } catch (e: HttpException) {
+                val errorKey = when (e.code()) {
+                    404 -> "game_not_found"
+                    409 -> "game_already_started"
+                    else -> "connection_error"
+                }
+                updateState { copy(error = errorKey, isJoining = false) }
             } catch (e: Exception) {
                 updateState {
                     copy(
-                        error = e.message ?: "Unknown error",
+                        error = "connection_error",
                         isJoining = false,
                     )
                 }
