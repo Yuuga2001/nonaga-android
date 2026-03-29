@@ -13,7 +13,7 @@ object HexlideColors {
 
     // Tile
     val TileFill = Color.White
-    val TileStroke = Color(0xFFe2e8f0)
+    val TileStroke = Color(0xFFcbd5e1)
 
     // Selection
     val SelectedGlow = Color(0xFFfbbf24)
@@ -22,7 +22,7 @@ object HexlideColors {
     val SelectedOriginFill = Color(0xFFfee2e2)
 
     // Background
-    val Background = Color(0xFFf8fafc)
+    val Background = Color(0xFFeef2f7)
 
     // Text
     val TextPrimary = Color(0xFF1e293b)
