@@ -68,6 +68,7 @@ class LocalGameViewModel @Inject constructor() : ViewModel() {
     val uiState: StateFlow<LocalGameUiState> = _uiState.asStateFlow()
 
     private var currentJob: Job? = null
+    private var initialized = false
 
     private fun updateState(block: LocalGameUiState.() -> LocalGameUiState) {
         _uiState.value = _uiState.value.block()
@@ -76,6 +77,13 @@ class LocalGameViewModel @Inject constructor() : ViewModel() {
     @VisibleForTesting
     internal fun setStateForTesting(modifier: (LocalGameUiState) -> LocalGameUiState) {
         _uiState.value = modifier(_uiState.value)
+    }
+
+    fun initializeIfNeeded() {
+        if (!initialized) {
+            initialized = true
+            startNewGame()
+        }
     }
 
     fun startNewGame() {
