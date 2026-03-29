@@ -6,6 +6,7 @@ sealed class Screen(val route: String) {
     data object OnlineGame : Screen("online_game/{gameId}") {
         fun createRoute(gameId: String) = "online_game/$gameId"
     }
+    data object Stats : Screen("stats")
     data object Settings : Screen("settings")
     data object WebView : Screen("webview/{url}") {
         fun createRoute(url: String) =

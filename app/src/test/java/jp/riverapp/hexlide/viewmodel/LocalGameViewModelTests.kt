@@ -1,5 +1,6 @@
 package jp.riverapp.hexlide.viewmodel
 
+import io.mockk.mockk
 import jp.riverapp.hexlide.data.model.GameMode
 import jp.riverapp.hexlide.data.model.GamePhase
 import jp.riverapp.hexlide.data.model.Piece
@@ -36,7 +37,7 @@ class LocalGameViewModelTests {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = LocalGameViewModel()
+        viewModel = LocalGameViewModel(context = mockk(relaxed = true))
     }
 
     @After

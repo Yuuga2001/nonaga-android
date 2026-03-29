@@ -17,6 +17,7 @@ import jp.riverapp.hexlide.data.model.GameMode
 import jp.riverapp.hexlide.presentation.localization.LocalizationManager
 import jp.riverapp.hexlide.presentation.screen.game.GameScreen
 import jp.riverapp.hexlide.presentation.screen.online.OnlineGameScreen
+import jp.riverapp.hexlide.presentation.screen.stats.AIStatsScreen
 import jp.riverapp.hexlide.presentation.screen.online.OnlineLobbyScreen
 import jp.riverapp.hexlide.presentation.screen.settings.InAppWebViewScreen
 import jp.riverapp.hexlide.presentation.screen.settings.SettingsScreen
@@ -57,9 +58,26 @@ fun HexlideNavHost(
                         navController.navigate(Screen.OnlineLobby.route)
                     }
                 },
+                onNavigateToStats = {
+                    if (backStackEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        navController.navigate(Screen.Stats.route)
+                    }
+                },
                 onNavigateToSettings = {
                     if (backStackEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
                         navController.navigate(Screen.Settings.route)
+                    }
+                },
+            )
+        }
+
+        // Stats
+        composable(Screen.Stats.route) { backStackEntry ->
+            AIStatsScreen(
+                strings = strings,
+                onBack = {
+                    if (backStackEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        navController.popBackStack()
                     }
                 },
             )

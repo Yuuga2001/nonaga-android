@@ -3,7 +3,10 @@ package jp.riverapp.hexlide.presentation.viewmodel
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import android.content.Context
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import jp.riverapp.hexlide.data.model.AIBattleStatsService
 import jp.riverapp.hexlide.data.model.GameMode
 import jp.riverapp.hexlide.data.model.GamePhase
 import jp.riverapp.hexlide.data.model.Piece
@@ -62,13 +65,16 @@ data class LocalGameUiState(
 }
 
 @HiltViewModel
-class LocalGameViewModel @Inject constructor() : ViewModel() {
+class LocalGameViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LocalGameUiState())
     val uiState: StateFlow<LocalGameUiState> = _uiState.asStateFlow()
 
     private var currentJob: Job? = null
     private var initialized = false
+    private var turnCount = 0
 
     private fun updateState(block: LocalGameUiState.() -> LocalGameUiState) {
         _uiState.value = _uiState.value.block()
@@ -89,6 +95,7 @@ class LocalGameViewModel @Inject constructor() : ViewModel() {
     fun startNewGame() {
         currentJob?.cancel()
         currentJob = null
+        turnCount = 0
 
         val state = _uiState.value
         val mode = state.mode
@@ -259,6 +266,16 @@ class LocalGameViewModel @Inject constructor() : ViewModel() {
                         phase = GamePhase.ENDED,
                     )
                 }
+                val s = _uiState.value
+                if (s.mode == GameMode.AI) {
+                    AIBattleStatsService.recordResult(
+                        context = context,
+                        won = currentTurn == s.myColor,
+                        turns = turnCount,
+                        myColor = s.myColor,
+                        wentFirst = s.myColor == PlayerColor.RED,
+                    )
+                }
                 return@launch
             }
 
@@ -293,6 +310,7 @@ class LocalGameViewModel @Inject constructor() : ViewModel() {
             ensureActive()
             updateState { copy(isAnimating = false) }
 
+            turnCount++
             val nextTurn = _uiState.value.turn.opposite
             updateState {
                 copy(

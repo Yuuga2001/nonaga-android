@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,6 +61,7 @@ fun GameScreen(
     viewModel: LocalGameViewModel = hiltViewModel(),
     localizationManager: LocalizationManager,
     onNavigateToOnline: () -> Unit = {},
+    onNavigateToStats: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -103,6 +105,17 @@ fun GameScreen(
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
+
+                IconButton(
+                    onClick = onNavigateToStats,
+                    modifier = Modifier.size(40.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.EmojiEvents,
+                        contentDescription = strings.aiStats,
+                        tint = HexlideColors.ModeAI,
+                    )
+                }
 
                 IconButton(
                     onClick = onNavigateToSettings,

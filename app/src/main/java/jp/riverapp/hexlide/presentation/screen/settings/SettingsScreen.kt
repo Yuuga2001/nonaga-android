@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.QuestionMark
@@ -138,8 +139,14 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Filled.Email,
                     title = strings.contact,
+                    onClick = { onNavigateToWebView(Constants.WebPages.CONTACT) },
+                )
+                SettingsDivider()
+                SettingsItem(
+                    icon = Icons.Filled.Home,
+                    title = strings.homepage,
                     onClick = {
-                        openExternalBrowser(context, Constants.WebPages.CONTACT)
+                        openExternalBrowser(context, Constants.WebPages.HOMEPAGE)
                     },
                 )
                 SettingsDivider()
@@ -398,5 +405,6 @@ private fun deleteLocalData(context: Context, localizationManager: LocalizationM
         .remove("nonaga_player_id")
         .remove("hexlide_lang")
         .apply()
+    jp.riverapp.hexlide.data.model.AIBattleStatsService.clear(context)
     localizationManager.setLanguage(Language.SYSTEM)
 }

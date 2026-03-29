@@ -26,7 +26,8 @@ object Constants {
     object WebPages {
         const val HOW_TO_PLAY = "https://hexlide.riverapp.jp/app/how-to-play"
         const val PRIVACY = "https://hexlide.riverapp.jp/app/privacy"
-        const val CONTACT = "https://forms.gle/oUp6JhYhTW7TF4qY6"
+        const val CONTACT = "https://hexlide.riverapp.jp/app/contact"
+        const val HOMEPAGE = "https://riverapp.jp/apps/hexlide"
         const val WEBSITE = "https://hexlide.riverapp.jp/app"
         const val WEB_VERSION = "https://hexlide.riverapp.jp"
         const val GOOGLE_PLAY_REVIEW = "market://details?id=jp.riverapp.hexlide"
